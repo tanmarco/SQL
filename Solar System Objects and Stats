@@ -1,0 +1,33 @@
+--In this SQL, I'm querying Solar System Object data to answer questions about the data.
+
+--display planet information
+SELECT body, volume, mass, density,surface_gravity,mean_radius 
+FROM solar_system_objects;
+
+--aggregate and display the average, maximum, and minimum of planets
+SELECT avg(volume) AS average_volume,max(mass) AS maximum_mass, min(density) as min_density 
+FROM solar_system_objects;
+
+--filtering the data to show objects with mass less than 200 and volume greater than 50
+SELECT body, mass, volume 
+FROM solar_system_objects 
+WHERE mass < 200 AND volume > 50;
+
+--categorizing the objects' surface gravity for target range
+SELECT body, surface_gravity, 
+    CASE
+        WHEN surface_gravity > 9.79 THEN 'high_gravity'     
+            WHEN surface_gravity < 9.77 THEN 'low_gravity'  
+            WHEN surface_gravity = 9.78033 THEN 'target_gravity'
+        END as 'gravity_type'
+FROM solar_system_objects 
+ORDER BY gravity_type asc;
+
+SELECT body, density,
+    CASE
+        WHEN density > 6 THEN 'above_target'
+        WHEN density < 5 THEN 'under_target'
+        ELSE 'target'
+        END AS 'volume_goals'
+FROM solar_system_objects
+ORDER BY volume_goals asc;
