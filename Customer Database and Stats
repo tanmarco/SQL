@@ -1,12 +1,14 @@
 --In this SQL, I'm querying a database with multiple table in it to quantify statistics about customer and order data.
 
 --How many orders were placed in January?
+
 SELECT COUNT(orderid)
 FROM BIT_DB.JanSales
 WHERE length(orderid) = 6
 AND orderid<> 'Order ID';
 
 --How many of those orders were for an iPhone?
+
 SELECT COUNT(orderid)
 FROM BIT_DB.JanSales
 WHERE product= 'iPhone'
@@ -14,6 +16,7 @@ AND length(orderid)=6
 AND orderid<> 'Order ID';
 
 --Select the customer account numbers for all the orders that were placed in February.
+
 SELECT distinct acctnum
 FROM BIT_DB.customers C
 INNER JOIN BIT_DB.FebSales F
@@ -22,23 +25,27 @@ WHERE length(orderid)=6
 AND orderid<> 'Order ID';
 
 --Which product was the cheapest sold in January, and what was the price?
+
 SELECT distinct product, price
 FROM BIT_DB.JanSales
 ORDER BY price ASC LIMIT 1;
 
 
 --What was the total revenue for each product sold in January?
+
 SELECT product,sum(quantity)*price AS revenue
 FROM BIT_DB.JanSales
 GROUP BY product;
 
 --Which products were sold in February at 548 Lincoln St, Seattle WA 98101, how many of each were sold, and what was the total revenue?
+
 SELECT orderid,product,sum(quantity), sum(quantity)*price AS revenue
 FROM BIT_DB.FEBSALES
 WHERE location='548 Lincoln St, Seattle, WA 98101'
 GROUP BY product;
 
 --How many customers ordered more than 2 products at a time, and what was the average amount spent for those customers?
+
 SELECT distinct count(acctnum), AVG(quantity*price)
 FROM customers c
 LEFT JOIN BIT_DB.FebSales F
@@ -48,7 +55,53 @@ AND length(orderid) =6
 AND orderid<> 'Order ID';
 
 --List all the products sold in Los Angeles, how many of each were sold.
+
 SELECT product, sum(quantity)
 FROM BIT_DB.FebSales
 WHERE location like '%Los Angeles%'
 GROUP BY product;
+
+--Which locations in New York received at least 3 orders in January, and how many orders did they each receive?
+
+SELECT distinct location, COUNT(orderid) 
+FROM BIT_DB.JANSALES
+WHERE location lIKE '%NY%'
+AND length(orderID) = 6
+AND orderID <> 'Order ID'
+GROUP BY location
+HAVING COUNT(orderID) > 2;
+
+--How many of each type of headphone were sold in February?
+
+SELECT product,SUM(quantity) AS 'quantity'
+FROM BIT_DB.FebSales
+WHERE product LIKE '%headphones%'
+AND orderID <> 'Order ID'
+AND length(orderID) = 6
+GROUP BY product;
+
+--What was the average amount spent per account in February? 
+
+SELECT avg(quantity*price)
+FROM BIT_DB.FEBSALES Feb
+LEFT JOIN BIT_DB.customers Cust
+ON Feb.orderid=Cust.order_id
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--What was the average quantity of products purchased per account in February?
+
+SELECT sum(quantity)/COUNT(acctnum)
+FROM BIT_DB.FebSales feb
+LEFT JOIN BIT_DB.customers cust
+ON feb.orderid = cust.order_id
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--Which product brought in the most revenue in January and how much revenue did it bring in total?
+
+SELECT product, SUM(quantity*price) AS revenue
+FROM BIT_DB.JanSales
+GROUP BY product
+ORDER BY SUM(quantity*price) desc
+LIMIT 1;
